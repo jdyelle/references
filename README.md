@@ -27,3 +27,6 @@ Host i-0############bba7
 
 ### Windows
 [Adding local drive aliases to the registry](https://superuser.com/questions/29072/how-to-make-subst-mapping-persistent-across-reboots)
+
+### AWS Supply Chain
+[Amazon Q with AWS Supply Chain](https://aws.amazon.com/about-aws/whats-new/2024/10/amazon-q-aws-supply-chain/)
