@@ -6,7 +6,7 @@ Combined with the [Lambda Calculator](https://github.com/awsdocs/aws-doc-sdk-exa
 
 ### The Simple Case
 
-The lambda calculator takes an input payload in JSON and performs basic math on these inputs, directed by the "action" property in the JSON.  We can re-use this same Lambda in a few places in our ASL to accomplish the math we need.  Here's an initial ASL definition to get us started, doing some basic arithmatic.
+The lambda calculator takes an input payload in JSON and performs basic math on these inputs, directed by the "action" property in the JSON.  We can re-use this same Lambda in a few places in our ASL to accomplish the math we need.  Here's an initial ASL definition to get us started, doing some basic arithmetic.
 
 ```
 {
