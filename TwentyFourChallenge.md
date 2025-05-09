@@ -256,4 +256,75 @@ This new state machine calculates `2 x 6` and `8 + 4` in parallel and sums them 
 This results in the following result:  
 ![Execution View](./_TwentyFourImg/parallel_view.png) 
 
-There are a number of parallel and iterative options, including the `Map` state type.  Amazon States Language is a great way to orchestrate your workflows between Lambdas and other Step-Functions-Integrated AWS Services.  Learning the initial syntax is a little tricky, but there are a lot of powerful capabilities once you do.
+Cleaning things up a bit:
+```
+{
+  "Comment": "An example of the Amazon States Language for using batch job with pre-processing lambda",
+  "StartAt": "InitialPayload",
+  "TimeoutSeconds": 3600,
+  "States": {
+    "InitialPayload": {
+      "Type": "Pass",
+      "Result": {
+        "a": "2",
+        "b": "4",
+        "c": "6",
+        "d": "8"
+      },
+      "ResultPath": "$.payload",
+      "Next": "Fork"
+    },
+    "Fork": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "SixTimesTwo",
+          "States": {
+            "SixTimesTwo": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:123456789011:function:LambdaCalculator:$LATEST",
+              "Parameters": {
+                "action": "multiply",
+                "x.$": "$.payload.a",
+                "y.$": "$.payload.c"
+              },
+              "ResultPath": "$.payload.math1out",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "FourPlusEight",
+          "States": {
+            "FourPlusEight": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:123456789011:function:LambdaCalculator:$LATEST",
+              "Parameters": {
+                "action": "add",
+                "x.$": "$.payload.b",
+                "y.$": "$.payload.d"
+              },
+              "ResultPath": "$.payload.math2out",
+              "End": true
+            }
+          }
+        }
+      ],
+      "Next": "TwelvePlusTwelve"
+    },
+    "TwelvePlusTwelve": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:123456789011:function:LambdaCalculator:$LATEST",
+      "Parameters": {
+        "action": "add",
+        "x.$": "States.JsonToString($[0].payload.math1out)",
+        "y.$": "States.JsonToString($[1].payload.math2out)"
+      },
+      "ResultPath": "$",
+      "End": true
+    }
+  }
+}
+```
+
+For this final example we're leaving all of the pipeline stuff behind and only passing what each state needs with the `Parameters` attribute.  This will not carry all of the previous state output json forward, and only pass what the state output is.  In this way, we can trim the json down to just what we need at each step.
