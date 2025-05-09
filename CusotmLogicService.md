@@ -13,7 +13,7 @@ By basing our solution around [AWS EventBridge Scheduler](https://aws.amazon.com
 - Reduce the binary artifact footprint for our container images
 - Eliminate the need for one-off services to be running consistently checking schedules for executions
 - Eliminate the need to deploy a multitude of always-on, redundant services (and associated config URLs) with slight differences in implementation details
-- Generate a lot of AWS savings by running on-demand workflows as serverless instead of always-on instances or containers
+- Realize AWS savings by running on-demand workflows as serverless instead of always-on instances or containers
 
 
 ## Technical Architecture
