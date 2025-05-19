@@ -22,6 +22,10 @@ At the simplest level, it's easy to have a service that directly invokes a Lambd
 
 At the simplest level, it's easy to have a service that directly invokes a Lambda.  By using a dynamodb to store the launch configurations and ARNs of the common logic pieces, we could refer to aliases for the versions of our Lambdas -- things like "Daily Report" or "User Account Validations" could be mapped to a specific Lambda ARN depending on the tenant.  That way, we can use the same client-side invocation for all lambdas called "Daily Report" and map them to different ARNs based on the client (or re-use a standard ARN in the case of no customizations).  
 
+![ARN Lookup](./_CustomLogicImg/lookup_arns.png)
+
+This allows professional services teams to select custom logic items when the tenant is set up.  In the examples above, Greg has a completely standardized implementation, Peter and Marsha have some customizations, and Jan is a completely custom implementation.
+
 Invocation either does a direct invocation on the ARN for that tenant, or creates a one-time schedule via [AWS EventBridge Scheduler](https://aws.amazon.com/eventbridge/scheduler/) to execute the Lambda asynchronously.  Since our implementation of asyncronous invocation did not implement callbacks to the main app, we relied on a database connection in the tenant's environnment configuration to update the database and/or endpoint targets with the relevant results.  
 
 ![Invocation](./_CustomLogicImg/invocation.png)
@@ -37,6 +41,8 @@ For our solution, we also included a Control Plane for the artifacts, ensuring t
 ![Registration](./_CustomLogicImg/registration.png)
 
 This allows segregation of responsibilities, where the Control Plane is responsible for creating and managing the objects in AWS, and the Custom Logic Service is responsible for execution, metadata, and tenant-specific logic.
+
+Scaling this service up is generally limited by the service limits -- for the tenant-specific roles, there is a default quota of 1000 IAM Roles per account, so using advanced governance strategies (in a multi-account fashion) such as AWS Organizations managed by AWS Control Tower may be necessary if you are managing many individual tenant roles.
 
 
 ## Benefits and Outcomes
@@ -54,7 +60,7 @@ We realized a number of benefits from this approach, notably:
 - Logs for the custom logic are conveniently placed in CloudWatch.  We found it advantageous to add [Structured Logging](https://aws.amazon.com/blogs/developer/structured-logging-for-net-lambda/) to the Lambda functions to capture details of which tenant was executing the artifact. 
 - Blue-green and Canary deployments can easily happen, since a new version of the artifact isn't configured for a client until the Custom Logic Service targets a different artifact for the same alias.  That way, a new version of an artifact can be thoroughly tested before transitioning.
 
-Most importantly, using this approach saved money on AWS consumption, by requiring fewer EC2 instances, and fewer containers deployed to EKS.
+Most importantly, using this approach saved money on AWS consumption, by allowing AWS cloud-native services to run on-demand and at intervals.  This eliminated the need for EC2 instances or containers deployed to EKS listening to events or running cron tasks.
 
 
 ## Conclusion
