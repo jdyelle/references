@@ -6,7 +6,7 @@ By using this approach, modernization teams can isolate tenant-specific code, wh
 
 ## Solution Overview
 
-The solution that we decided on involves using an intermediary service that tracks artifacts (Lambdas or Step Functions), schedules, and allows using a common name to look up the approprate ARN for a tenant-specific piece of logic.  We will call this intermediary service "Custom Logic Service" since it allows invocation of artifacts dynamically based on a common name.  Invoking the artifact for "Daily Report" or "User Account Validations" from the client side can be translated to a specific Lambda or Step Function ARN depending on the tenant.
+The solution that we decided on involves using an intermediary service that tracks artifacts (Lambdas or Step Functions), schedules, and allows using a common name to look up the appropriate ARN for a tenant-specific piece of logic.  We will call this intermediary service "Custom Logic Service" since it allows invocation of artifacts dynamically based on a common name.  Invoking the artifact for "Daily Report" or "User Account Validations" from the client side can be translated to a specific Lambda or Step Function ARN depending on the tenant.
 
 By basing our solution around [AWS EventBridge Scheduler](https://aws.amazon.com/eventbridge/scheduler/), and invokable artifacts, we were able to:
 - Enable multitenancy in our EKS Cluster Binaries by refactoring custom code
@@ -26,7 +26,7 @@ At the simplest level, it's easy to have a service that directly invokes a Lambd
 
 This allows professional services teams to select custom logic items when the tenant is set up.  In the examples above, Greg has a completely standardized implementation, Peter and Marsha have some customizations, and Jan is a completely custom implementation.
 
-Invocation either does a direct invocation on the ARN for that tenant, or creates a one-time schedule via [AWS EventBridge Scheduler](https://aws.amazon.com/eventbridge/scheduler/) to execute the Lambda asynchronously.  Since our implementation of asyncronous invocation did not implement callbacks to the main app, we relied on a database connection in the tenant's environnment configuration to update the database and/or endpoint targets with the relevant results.  
+Invocation either does a direct invocation on the ARN for that tenant, or creates a one-time schedule via [AWS EventBridge Scheduler](https://aws.amazon.com/eventbridge/scheduler/) to execute the Lambda asynchronously.  Since our implementation of asynchronous invocation did not implement callbacks to the main app, we relied on a database connection in the tenant's environment configuration to update the database and/or endpoint targets with the relevant results.  
 
 ![Invocation](./_CustomLogicImg/invocation.png)
 
@@ -65,7 +65,7 @@ Most importantly, using this approach saved money on AWS consumption, by allowin
 
 ## Conclusion
 
-Many B2B SaaS providers are able to adopt their solution to customers needs, and historically that was through various configuration setttings, SQL scripts, or dynamically loading custom libraries.  With the power of serverless cloud computing, those custom processes and integrations can be moved to the serverless cloud and organized with a simple service.  This allows the bulk of any application to be deployed in a consistent, scalable way while maintaing the external logic that needs to run on-demand for a specific customer.
+Many B2B SaaS providers are able to adopt their solution to customers needs, and historically that was through various configuration settings, SQL scripts, or dynamically loading custom libraries.  With the power of serverless cloud computing, those custom processes and integrations can be moved to the serverless cloud and organized with a simple service.  This allows the bulk of any application to be deployed in a consistent, scalable way while maintaining the external logic that needs to run on-demand for a specific customer.
 
 To learn more about migrating custom logic to serverless solutions, please contact us via our [AWS Partner Network Page](https://partners.amazonaws.com/partners/001E000001QMw8yIAD/Caylent) or our [Website](https://caylent.com/).  Jeremy Yelle is a Software Architect at Caylent with over 20 years of in enterprise SaaS products, most recently focusing on transitioning legacy stacks to cloud native technologies.  Caylent was named the [AWS Migration Partner of the Year](https://aws.amazon.com/blogs/apn/announcing-the-2024-geo-and-global-aws-partners-of-the-year/) and has over 2000 customer launches on AWS Services.
 
