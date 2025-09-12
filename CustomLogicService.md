@@ -1,7 +1,7 @@
 ## Modernizing custom SaaS logic with Lambda, EventBridge, and Step Functions 
-Often with a B2B SaaS product, enterprise implementations require customizations that are embedded in legacy libraries, custom deployments, or configuration rules that are encoded in custom pieces of code and not part of the execution environment.  These custom pieces of code may be event-based, can be synchronous (in the case of validations) or asynchronous (in the case of integrations), or periodic in nature.  In this blog post, we will discuss how using AWS Lambda, AWS EventBridge, and AWS Step Functions can provide a path to modernizing these pieces of code such that the customizations are triggered on-demand and very cost-effective.  
+Often, with a B2B SaaS product, enterprise implementations require customizations that are embedded in legacy libraries, custom deployments, or configuration rules that are encoded in custom pieces of code and not part of the execution environment.  These custom pieces of code may be event-based, can be synchronous (in the case of validations) or asynchronous (in the case of integrations), or periodic in nature.  In this blog post, we will discuss how using AWS Lambda, AWS EventBridge, and AWS Step Functions can provide a path to modernizing these pieces of code such that the customizations are triggered on-demand and very cost-effective.  
 
-By using this approach, modernization teams can isolate tenant-specific code, which allows for creating tenant-agnostic containers or environments that allows for a standardized, multitenant application to be published to end-users.  At Caylent, this is one of the major barriers that we see to cloud adoption of legacy SaaS based products, where customer-specific logic may be embedded in custom modules, sql statements, or environment configurations.  
+By using this approach, modernization teams can isolate tenant-specific code, which allows for creating tenant-agnostic containers or environments that allow for a standardized, multitenant application to be published to end-users.  This is one of the major barriers we see at Caylent to cloud adoption of legacy SaaS based products, where customer-specific logic may be embedded in custom modules, sql statements, or environment configurations.  
 
 
 ## Solution Overview
@@ -18,9 +18,7 @@ By basing our solution around [AWS EventBridge Scheduler](https://aws.amazon.com
 
 ## Technical Architecture
 
-At the simplest level, it's easy to have a service that directly invokes a Lambda.  By using a dynamodb to store the launch configurations and ARNs of the common logic pieces, we could refer to aliases for the versions of our Lambdas.  That way, we can use the same client-side invocation for all lambdas called "Daily Report" and map them to different ARNs based on the client (or re-use a standard ARN in the case of no customizations). 
-
-At the simplest level, it's easy to have a service that directly invokes a Lambda.  By using a dynamodb to store the launch configurations and ARNs of the common logic pieces, we could refer to aliases for the versions of our Lambdas -- things like "Daily Report" or "User Account Validations" could be mapped to a specific Lambda ARN depending on the tenant.  That way, we can use the same client-side invocation for all lambdas called "Daily Report" and map them to different ARNs based on the client (or re-use a standard ARN in the case of no customizations).  
+At the simplest level, it's easy to have a service that directly invokes a Lambda.  By using a DynamoDB to store the launch configurations and ARNs of the common logic pieces, we could refer to aliases for the versions of our Lambdas -- things like "Daily Report" or "User Account Validations" could be mapped to a specific Lambda ARN depending on the tenant.  That way, we can use the same client-side invocation for all lambdas called "Daily Report" and map them to different ARNs based on the client (or re-use a standard ARN in the case of no customizations).  
 
 ![ARN Lookup](./_CustomLogicImg/lookup_arns.png)
 
@@ -51,21 +49,21 @@ We realized a number of benefits from this approach, notably:
 
 - Artifacts can be invoked using a common name by the legacy system.  This allows for tenant-agnostic invocations of custom artifacts.
 - Artifact code can consume parameters that are passed by the upstream system, or connect to the configuration environment directly.
-- For our case we are referring to artifacts as Lambdas, but Lambdas have certain service limits.  By expanding the definition of "artifact", we can apply the same logic to any service within AWS that the Custom Logic Service supports, without changing the upstream code:
+- For our case we are referring to artifacts as Lambda functions, but Lambda functions have certain service limits.  By expanding the definition of "artifact", we can apply the same logic to any service within AWS that the Custom Logic Service supports, without changing the upstream code:
     - AWS Step Functions Workflows (Standard OR Express)
     - ECS Fargate Tasks
     - AWS Batch Jobs (in EKS)
 - Since the execution role of the artifacts is set at registration time, we can attach tenant-specific IAM roles to the artifacts.
 - Given the appropriate role permissions, a tenant could give authorization to objects in their AWS account and use cross-account permissions for custom logic.
 - Logs for the custom logic are conveniently placed in CloudWatch.  We found it advantageous to add [Structured Logging](https://aws.amazon.com/blogs/developer/structured-logging-for-net-lambda/) to the Lambda functions to capture details of which tenant was executing the artifact. 
-- Blue-green and Canary deployments can easily happen, since a new version of the artifact isn't configured for a client until the Custom Logic Service targets a different artifact for the same alias.  That way, a new version of an artifact can be thoroughly tested before transitioning.
+- Blue-green and canary deployments can easily happen, since a new version of the artifact isn't configured for a client until the Custom Logic Service targets a different artifact for the same alias.  That way, a new version of an artifact can be thoroughly tested before transitioning.
 
 Most importantly, using this approach saved money on AWS consumption, by allowing AWS cloud-native services to run on-demand and at intervals.  This eliminated the need for EC2 instances or containers deployed to EKS listening to events or running cron tasks.
 
 
 ## Conclusion
 
-Many B2B SaaS providers are able to adopt their solution to customers needs, and historically that was through various configuration settings, SQL scripts, or dynamically loading custom libraries.  With the power of serverless cloud computing, those custom processes and integrations can be moved to the serverless cloud and organized with a simple service.  This allows the bulk of any application to be deployed in a consistent, scalable way while maintaining the external logic that needs to run on-demand for a specific customer.
+Many B2B SaaS providers are able to adapt their solution to customers' needs, and historically that was through various configuration settings, SQL scripts, or dynamically loading custom libraries.  With the power of serverless cloud computing, those custom processes and integrations can be moved to the serverless cloud and organized with a simple service.  This allows the bulk of any application to be deployed in a consistent, scalable way while maintaining the external logic that needs to run on-demand for a specific customer.
 
-To learn more about migrating custom logic to serverless solutions, please contact us via our [AWS Partner Network Page](https://partners.amazonaws.com/partners/001E000001QMw8yIAD/Caylent) or our [Website](https://caylent.com/).  Jeremy Yelle is a Software Architect at Caylent with over 20 years of in enterprise SaaS products, most recently focusing on transitioning legacy stacks to cloud native technologies.  Caylent was named the [AWS Migration Partner of the Year](https://aws.amazon.com/blogs/apn/announcing-the-2024-geo-and-global-aws-partners-of-the-year/) and has over 2000 customer launches on AWS Services.
+To learn more about migrating custom logic to serverless solutions, please contact us through our [AWS Partner Network Page](https://partners.amazonaws.com/partners/001E000001QMw8yIAD/Caylent) or our [Website](https://caylent.com/).  Jeremy Yelle is a Software Architect at Caylent with over 20 years of experience in enterprise SaaS products, most recently focusing on transitioning legacy stacks to cloud native technologies.  Caylent was named the [AWS Migration Partner of the Year](https://aws.amazon.com/blogs/apn/announcing-the-2024-geo-and-global-aws-partners-of-the-year/) and has over 2000 customer launches on AWS Services.
 
