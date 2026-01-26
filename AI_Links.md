@@ -1,3 +1,6 @@
+### Tools
+[Page Index Alternative Search](https://docs.pageindex.ai/)
+
 ### Project Setup
 [Traycer - Project Planner](https://traycer.ai/#pricing)
 [Linear - AI Workflows for Product Teams](https://linear.app/ai)
