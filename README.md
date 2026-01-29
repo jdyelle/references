@@ -30,3 +30,6 @@ Host i-0############bba7
 
 ### AWS Supply Chain
 [Amazon Q with AWS Supply Chain](https://aws.amazon.com/about-aws/whats-new/2024/10/amazon-q-aws-supply-chain/)
+
+### Claude Code Skills etc
+https://github.com/affaan-m/everything-claude-code
