@@ -33,3 +33,8 @@ Host i-0############bba7
 
 ### Claude Code Skills etc
 https://github.com/affaan-m/everything-claude-code
+
+
+### Windows
+[Seleen UI Desktop Customization](https://github.com/eythaann/Seelen-UI)
+[Rainmeter Desktop Customization](https://www.rainmeter.net/)
